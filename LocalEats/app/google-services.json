@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "607393894154",
+    "project_id": "localeats-55800",
+    "storage_bucket": "localeats-55800.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:607393894154:android:7ecb5bcc437761a43834f3",
+        "android_client_info": {
+          "package_name": "com.example.localeats"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCmz_QR5OROo4FK3CT_RVucUVLbpT79l3o"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

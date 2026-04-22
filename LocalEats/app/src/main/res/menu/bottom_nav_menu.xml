@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+        <item android:id="@+id/nav_map" android:title="Map" android:icon="@drawable/baseline_map_24"/>
+        <item android:id="@+id/nav_feed" android:title="Feed" android:icon="@drawable/baseline_dynamic_feed_24"/>
+        <item android:id="@+id/nav_profile" android:title="Profile" android:icon="@drawable/ic_profile"/>
+</menu>
