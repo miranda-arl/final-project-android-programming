@@ -189,9 +189,9 @@ class PlaceRepository {
             .addHeader("X-Goog-Api-Key", apiKey)
             .addHeader(
                 "X-Goog-FieldMask",
-                "suggestions.placePrediction.placeId,suggestions.placePrediction.text.text"
-            )
+                "suggestions.placePrediction.placeId,suggestions.placePrediction.text.text" )
             .build()
+// ,suggestions.placePrediction.formattedAddress"
 
         client.newCall(request).enqueue(object : Callback {
 
@@ -215,9 +215,12 @@ class PlaceRepository {
                         .getJSONObject("text")
                         .optString("text")
 
+                    // val address = prediction.optString("formattedAddress")
+
                     val place = Place.builder()
                         .setId(id)
                         .setName(name)
+                        // .setAddress(address)
                         .build()
 
                     results.add(place)

@@ -12,6 +12,7 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import com.example.localeats.R
+import com.example.localeats.model.PlaceDetails
 import com.example.localeats.utils.MapViewModel
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
@@ -21,7 +22,6 @@ import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MarkerOptions
-import com.google.android.libraries.places.api.model.Place
 
 class MapFragment : Fragment(), OnMapReadyCallback {
 
@@ -73,7 +73,15 @@ class MapFragment : Fragment(), OnMapReadyCallback {
                             // .snippet(place.address ?: "")
                     )
 
-                    marker?.tag = place// ?: "" //.id
+                    val placeUI = PlaceDetails(
+                        id = place.id ?: "",
+                        name = place.name ?: "",
+                        address = place.address ?: "Unknown address",
+                        latLng = latLng
+                    )
+
+                    marker?.tag = placeUI
+                    // marker?.tag = place // ?: "" //.id
                     marker?.showInfoWindow()
                     if (marker != null) currentMarkers.add(marker)
                 }
@@ -113,14 +121,13 @@ class MapFragment : Fragment(), OnMapReadyCallback {
                         .title(details.name)
                 )
 
-                 marker?.tag = details.id
+                marker?.tag = details // .id
+                marker?.showInfoWindow()
 
                 googleMap.animateCamera(
                     CameraUpdateFactory.newLatLngZoom(latLng, 15f)
                 )
             }
-
-            Toast.makeText(requireContext(), details.name, Toast.LENGTH_SHORT).show()
         }
     }
 
@@ -140,8 +147,9 @@ class MapFragment : Fragment(), OnMapReadyCallback {
 
         googleMap.setOnMarkerClickListener { marker ->
             // val placeId = marker.tag as? String
+            Log.e("marker", "{$marker} and tag ${marker.tag}")
 
-            val place = marker.tag as? Place ?: return@setOnMarkerClickListener true
+            val place = marker.tag as? PlaceDetails ?: return@setOnMarkerClickListener true
 
             // if (placeId.isNullOrEmpty()) return@setOnMarkerClickListener true
             // val name = marker.title ?: "Restaurant"

@@ -5,6 +5,7 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.inputmethod.EditorInfo
 import android.widget.EditText
 import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.Fragment
@@ -40,6 +41,7 @@ class SearchFragment : Fragment() {
         viewModel = ViewModelProvider(requireActivity())[MapViewModel::class.java]
 
         val searchInput = view.findViewById<EditText>(R.id.search_input)
+        val clearBut = view.findViewById<View>(R.id.clear_button)
         val recyclerView = view.findViewById<RecyclerView>(R.id.recycler_view)
 
         recyclerView.layoutManager = LinearLayoutManager(requireContext())
@@ -54,11 +56,16 @@ class SearchFragment : Fragment() {
             adapter.submitList(places)
         }
 
+        clearBut.setOnClickListener {
+            searchInput.text.clear()
+        }
+
         searchInput.addTextChangedListener {
             val query = it.toString().trim()
             if (query.length >= 2) {
                 Log.e("SEARCH FRAGMENT", "Searching for: $query")
                 viewModel.searchPlaces(API_KEY, query)
+                recyclerView.visibility = View.VISIBLE
             }
             if (query.isEmpty()) {
                 // optional manual reset trigger
