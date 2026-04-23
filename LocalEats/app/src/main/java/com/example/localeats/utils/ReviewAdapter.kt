@@ -9,10 +9,20 @@ import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.example.localeats.R
 import com.example.localeats.data.Review
+import android.text.SpannableString
+import android.text.Spanned
+import android.text.style.BackgroundColorSpan
+import android.graphics.Color
 
 class ReviewAdapter(private var reviews: List<Review>,
                     private val viewModel: ReviewViewModel) :
     RecyclerView.Adapter<ReviewAdapter.ViewHolder>() {
+    private var query: String = ""
+
+    fun setQuery(q: String) {
+        query = q
+        notifyDataSetChanged()
+    }
 
     class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         val userName: TextView = view.findViewById(R.id.userName)
@@ -32,8 +42,9 @@ class ReviewAdapter(private var reviews: List<Review>,
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val review = reviews[position]
-        holder.userName.text = review.userName
-        holder.reviewText.text = review.comment
+        holder.userName.text = highlightQuery(review.userName, query)
+        holder.reviewText.text = highlightQuery(review.comment, query)
+
         holder.ratingBar.rating = review.rating
 
         if (!review.imageUUID.isNullOrEmpty()) {
@@ -48,5 +59,27 @@ class ReviewAdapter(private var reviews: List<Review>,
     fun updateData(newReviews: List<Review>) {
         reviews = newReviews
         notifyDataSetChanged()
+    }
+
+    fun highlightQuery(text: String, query: String): SpannableString {
+        val spannable = SpannableString(text)
+        val q = query.trim()
+
+        if (q.isEmpty()) return spannable
+
+        val lowerText = text.lowercase()
+        val lowerQuery = q.lowercase()
+
+        var startIndex = lowerText.indexOf(lowerQuery)
+        while (startIndex >= 0) {
+            spannable.setSpan(
+                BackgroundColorSpan(Color.YELLOW),
+                startIndex,
+                startIndex + q.length,
+                Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
+            )
+            startIndex = lowerText.indexOf(lowerQuery, startIndex + q.length)
+        }
+        return spannable
     }
 }
