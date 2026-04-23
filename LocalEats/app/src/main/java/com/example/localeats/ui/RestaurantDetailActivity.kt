@@ -9,13 +9,15 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.localeats.R
+import com.example.localeats.utils.PhotoMetaAdapter
 import com.example.localeats.utils.ReviewAdapter
 import com.example.localeats.utils.ReviewViewModel
 
 class RestaurantDetailActivity : AppCompatActivity() {
 
     private lateinit var viewModel: ReviewViewModel
-    private lateinit var adapter: ReviewAdapter
+    private lateinit var reviewAdapter: ReviewAdapter
+    private lateinit var imageAdapter: PhotoMetaAdapter
 
     private lateinit var placeId: String
 
@@ -32,15 +34,35 @@ class RestaurantDetailActivity : AppCompatActivity() {
         val recycler = findViewById<RecyclerView>(R.id.reviewRecycler)
         recycler.layoutManager = LinearLayoutManager(this)
 
-        adapter = ReviewAdapter(emptyList())
-        recycler.adapter = adapter
-
         viewModel = ViewModelProvider(this)[ReviewViewModel::class.java]
+
+        reviewAdapter = ReviewAdapter(emptyList(), viewModel)
+        recycler.adapter = reviewAdapter
 
         viewModel.getReviewsForPlace(placeId)
 
         viewModel.reviews.observe(this) {
-            adapter.updateData(it)
+            reviewAdapter.updateData(it)
+        }
+
+        val photoRecycler = findViewById<RecyclerView>(R.id.photosRv)
+        photoRecycler.layoutManager = LinearLayoutManager(this)
+
+        imageAdapter = PhotoMetaAdapter(viewModel) { photo ->
+            val fragment = PhotoDetailFragment.newInstance(photo)
+
+            supportFragmentManager.beginTransaction()
+                .replace(R.id.fragmentContainer, fragment)
+                .addToBackStack(null)
+                .commit()
+        }
+
+        photoRecycler.adapter = imageAdapter
+
+        viewModel.getPhotosForPlace(placeId)
+
+        viewModel.photoMetaList.observe(this) {
+            imageAdapter.submitList(it)
         }
 
         findViewById<Button>(R.id.addReviewBtn).setOnClickListener {

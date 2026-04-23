@@ -29,19 +29,11 @@ class MapFragment : Fragment(), OnMapReadyCallback {
 
     private lateinit var viewModel: MapViewModel
 
-    private val placesClient by lazy {
-        Places.createClient(requireContext())
-    }
-
     private val API_KEY by lazy {
         getString(R.string.google_maps_key)
     }
 
     private lateinit var fusedLocationClient: FusedLocationProviderClient
-
-//    private var isMapReady = false
-//    private var hasLocationPermission = false
-//    private var lastKnownLatLng: LatLng? = null
 
     private var currentMarkers = mutableListOf<com.google.android.gms.maps.model.Marker>()
 

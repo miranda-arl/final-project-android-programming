@@ -38,10 +38,11 @@ class ProfileFragment : Fragment() {
         emailText.text = user?.email ?: "Not logged in"
 
         recycler.layoutManager = LinearLayoutManager(requireContext())
-        adapter = ReviewAdapter(emptyList())
-        recycler.adapter = adapter
 
         viewModel = ViewModelProvider(this)[ReviewViewModel::class.java]
+
+        adapter = ReviewAdapter(emptyList(), viewModel)
+        recycler.adapter = adapter
 
         user?.uid?.let {
             viewModel.getReviewsForUser(it)

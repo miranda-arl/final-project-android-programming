@@ -2,6 +2,8 @@ plugins {
     id 'com.android.application'
     id 'com.google.gms.google-services'
     id 'com.google.devtools.ksp'
+    id 'org.jetbrains.kotlin.android'
+    id 'kotlin-parcelize'
 }
 
 android {
@@ -38,6 +40,10 @@ dependencies {
     implementation 'androidx.constraintlayout:constraintlayout:2.2.1'
     implementation 'com.google.android.material:material:1.13.0'
 
+    implementation 'androidx.activity:activity-ktx:1.12.4'
+    implementation 'androidx.fragment:fragment-ktx:1.8.9'
+    implementation 'androidx.recyclerview:recyclerview:1.4.0'
+
     // Firebase (fixed)
     implementation platform('com.google.firebase:firebase-bom:33.5.1')
     implementation 'com.google.firebase:firebase-auth-ktx'
@@ -45,6 +51,7 @@ dependencies {
     implementation 'com.google.firebase:firebase-storage-ktx'
 
     implementation 'com.firebaseui:firebase-ui-auth:9.1.1'
+    implementation 'com.firebaseui:firebase-ui-storage:9.1.1'
 
     // Maps + Places
     implementation 'com.google.android.gms:play-services-maps:20.0.0'

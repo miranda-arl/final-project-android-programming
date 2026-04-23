@@ -7,11 +7,11 @@ import android.widget.ImageView
 import android.widget.RatingBar
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
-import com.bumptech.glide.Glide
 import com.example.localeats.R
 import com.example.localeats.data.Review
 
-class ReviewAdapter(private var reviews: List<Review>) :
+class ReviewAdapter(private var reviews: List<Review>,
+                    private val viewModel: ReviewViewModel) :
     RecyclerView.Adapter<ReviewAdapter.ViewHolder>() {
 
     class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
@@ -36,14 +36,10 @@ class ReviewAdapter(private var reviews: List<Review>) :
         holder.reviewText.text = review.comment
         holder.ratingBar.rating = review.rating
 
-        if (review.imageUrl.isNotEmpty()) {
+        if (!review.imageUUID.isNullOrEmpty()) {
             holder.imageView.visibility = View.VISIBLE
 
-            Glide.with(holder.itemView.context)
-                .load(review.imageUrl)
-                //.placeholder(R.drawable.placeholder)
-                //.error(R.drawable.placeholder)
-                .into(holder.imageView)
+            viewModel.glideFetch(review.imageUUID, holder.imageView)
         } else {
             holder.imageView.visibility = View.GONE
         }

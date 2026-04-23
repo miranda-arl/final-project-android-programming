@@ -45,7 +45,7 @@ class PlaceRepository {
             }
 
             override fun onResponse(call: Call, response: Response) {
-                Log.e("PLACE DETAILS", "Response: ${response.code} - ${response.body}")
+                // Log.e("PLACE DETAILS", "Response: ${response.code} - ${response.body}")
                 val json = JSONObject(response.body!!.string())
                 Log.d("API_BODY", json.toString())
                 val name = json.optJSONObject("displayName")
@@ -112,7 +112,7 @@ class PlaceRepository {
         client.newCall(request).enqueue(object : Callback {
 
             override fun onFailure(call: Call, e: IOException) {
-                Log.e("PlaceRepo", "Nearby failed", e)
+                // Log.e("PlaceRepo", "Nearby failed", e)
                 callback(emptyList())
             }
 
@@ -122,7 +122,7 @@ class PlaceRepository {
                         callback(emptyList()); return
                     }
 
-                    Log.e("PlaceRepo", "code: ${response.code} - body: $body")
+                    // Log.e("PlaceRepo", "code: ${response.code} - body: $body")
                     val json = JSONObject(body)
                     val placesArray = json.optJSONArray("places") ?: run {
                         callback(emptyList()); return
@@ -159,7 +159,7 @@ class PlaceRepository {
                     callback(results)
 
                 } catch (e: Exception) {
-                    Log.e("PlaceRepo", "Parse error", e)
+                    // Log.e("PlaceRepo", "Parse error", e)
                     callback(emptyList())
                 }
             }

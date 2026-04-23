@@ -28,10 +28,10 @@ class FeedFragment : Fragment() {
         val recyclerView = view.findViewById<RecyclerView>(R.id.feedRecyclerView)
         recyclerView.layoutManager = LinearLayoutManager(requireContext())
 
-        adapter = ReviewAdapter(emptyList())
-        recyclerView.adapter = adapter
-
         viewModel = ViewModelProvider(this)[ReviewViewModel::class.java]
+
+        adapter = ReviewAdapter(emptyList(), viewModel)
+        recyclerView.adapter = adapter
 
         viewModel.reviews.observe(viewLifecycleOwner) {
             android.util.Log.d("FEED", "Received reviews: ${it.size}")

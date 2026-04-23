@@ -1,23 +1,35 @@
 package com.example.localeats.ui
 
-import android.content.Intent
-import android.net.Uri
 import android.os.Bundle
 import android.widget.Button
 import android.widget.EditText
 import android.widget.RatingBar
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import com.example.localeats.R
 import com.example.localeats.data.Review
+import com.example.localeats.utils.ReviewViewModel
+import com.example.localeats.utils.TakePictureWrapper
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
-import com.google.firebase.storage.FirebaseStorage
-import java.util.UUID
 
 class AddReviewActivity : AppCompatActivity() {
 
-    private var imageUri: Uri? = null
+    private var imageUUID: String? = null
     private lateinit var placeId: String
+
+    private val viewModel: ReviewViewModel by viewModels()
+
+    private val cameraLauncher = registerForActivityResult(
+        ActivityResultContracts.TakePicture()) { success ->
+        if (success) {
+            viewModel.pictureSuccess()
+        } else {
+            viewModel.pictureFailure()
+        }
+    }
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -29,9 +41,13 @@ class AddReviewActivity : AppCompatActivity() {
         val submitBtn = findViewById<Button>(R.id.submitBtn)
 
         uploadBtn.setOnClickListener {
-            val intent = Intent(Intent.ACTION_PICK)
-            intent.type = "image/*"
-            startActivityForResult(intent, 100)
+            viewModel.pictureNameByUser = placeId
+            TakePictureWrapper.takePicture(
+                placeId,
+                this,
+                viewModel,
+                cameraLauncher
+            )
         }
 
         submitBtn.setOnClickListener {
@@ -39,41 +55,15 @@ class AddReviewActivity : AppCompatActivity() {
         }
     }
 
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
-
-        if (requestCode == 100 && resultCode == RESULT_OK) {
-            imageUri = data?.data
-        }
-    }
-
     private fun uploadReview() {
         val rating = findViewById<RatingBar>(R.id.ratingBar).rating
         val comment = findViewById<EditText>(R.id.commentInput).text.toString()
 
-        if (imageUri != null) {
-            uploadImageAndSave(rating, comment)
-        } else {
-            saveReview(rating, comment, "")
-        }
+        val imageUUID = viewModel.uploadedPhotoUUID ?: ""
+        saveReview(rating, comment, imageUUID)
     }
 
-    private fun uploadImageAndSave(rating: Float, comment: String) {
-        val storageRef = FirebaseStorage.getInstance()
-            .reference.child("images/${UUID.randomUUID()}")
-
-        imageUri?.let { uri ->
-            storageRef.putFile(uri)
-                .continueWithTask { task ->
-                    storageRef.downloadUrl
-                }
-                .addOnSuccessListener { downloadUrl ->
-                    saveReview(rating, comment, downloadUrl.toString())
-                }
-        }
-    }
-
-    private fun saveReview(rating: Float, comment: String, imageUrl: String) {
+    private fun saveReview(rating: Float, comment: String, imageUUID: String) {
         val user = FirebaseAuth.getInstance().currentUser
 
         val review = Review(
@@ -82,7 +72,7 @@ class AddReviewActivity : AppCompatActivity() {
             comment = comment,
             rating = rating,
             placeId = placeId,
-            imageUrl = imageUrl
+            imageUUID = imageUUID
         )
 
         FirebaseFirestore.getInstance()
