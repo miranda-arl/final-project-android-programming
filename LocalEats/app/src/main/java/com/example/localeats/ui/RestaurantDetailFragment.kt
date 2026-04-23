@@ -6,6 +6,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
+import android.widget.ImageButton
 import android.widget.RatingBar
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
@@ -43,10 +44,13 @@ class RestaurantDetailFragment : Fragment() {
         val view = inflater.inflate(R.layout.fragment_restaurant_detail, container, false)
 
         val name = arguments?.getString("name")
-        val address = "("+arguments?.getString("address")+")"
+        val address = arguments?.getString("address")
 
         view.findViewById<TextView>(R.id.restaurantName).text = name
         view.findViewById<TextView>(R.id.address).text = address
+
+        val lcnBtn = view.findViewById<ImageButton>(R.id.locationBtn)
+        setBackgroundDrawable(lcnBtn, R.drawable.baseline_location_on_24)
 
         val reviewRecycler = view.findViewById<RecyclerView>(R.id.reviewRecycler)
         reviewRecycler.layoutManager = LinearLayoutManager(requireContext())
@@ -94,8 +98,16 @@ class RestaurantDetailFragment : Fragment() {
 
         viewModel.averageRating.observe(viewLifecycleOwner) { avg ->
             view.findViewById<RatingBar>(R.id.ratingBar).rating = avg
+
+            view.findViewById<TextView>(R.id.ratingText).text =
+                "Rating: ${avg ?: 0.0} (${viewModel.reviews.value?.size ?: 0} reviews)"
         }
 
         return view
+    }
+
+    fun setBackgroundDrawable(button: ImageButton, resourceId: Int) {
+        button.setBackgroundResource(resourceId)
+        button.tag = resourceId
     }
 }

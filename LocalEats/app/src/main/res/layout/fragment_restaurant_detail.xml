@@ -11,9 +11,32 @@
         android:textStyle="bold"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"/>
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+        <ImageButton
+            android:id="@+id/locationBtn"
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:tag="locationButton"
+            android:src="@drawable/baseline_location_on_24"
+            android:gravity="center"
+            android:layout_gravity="center"
+            android:layout_marginEnd="10dp"/>
+        <TextView
+            android:id="@+id/address"
+            android:text="address"
+            android:textSize="20sp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+    </LinearLayout>
+
     <TextView
-        android:id="@+id/address"
-        android:textSize="20sp"
+        android:id="@+id/ratingText"
+        android:text="Rating: "
+        android:textStyle="bold"
+        android:textSize="15sp"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"/>
     <LinearLayout
@@ -39,20 +62,21 @@
         android:text="Photos: "
         android:textSize="15sp"
         android:textStyle="bold"/>
+
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/photosRv"
         android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1"/>
+        android:layout_height="wrap_content"/>
+
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Reviews: "
         android:textSize="15sp"
         android:textStyle="bold"/>
+
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/reviewRecycler"
         android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1"/>
+        android:layout_height="wrap_content"/>
 </LinearLayout>

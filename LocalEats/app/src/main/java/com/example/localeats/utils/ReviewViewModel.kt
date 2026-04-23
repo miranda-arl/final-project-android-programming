@@ -8,6 +8,7 @@ import com.example.localeats.data.Review
 import com.example.localeats.data.ReviewRepository
 import com.example.localeats.glide.Glide
 import com.example.localeats.model.PhotoMeta
+import com.example.localeats.model.UploadState
 import java.io.File
 
 class ReviewViewModel : ViewModel() {
@@ -32,8 +33,9 @@ class ReviewViewModel : ViewModel() {
 
     var pictureNameByUser = "" // String provided by the user
 
-//    var currentPhotoFile: File? = null
-//    var currentPhotoUUID: String? = null
+    private val _uploadState = MutableLiveData<UploadState>(UploadState.Idle)
+    val uploadState: LiveData<UploadState> = _uploadState
+
     var uploadedPhotoUUID: String? = null
 
     private var currentAuthUser = invalidUser
@@ -137,7 +139,13 @@ class ReviewViewModel : ViewModel() {
 
             pictureUUID = ""
             pictureNameByUser = ""
+
+            _uploadState.postValue(UploadState.Success)
         }
+    }
+
+    fun resetUploadState() {
+        _uploadState.value = UploadState.Idle
     }
 
 //    fun getCurrentPhotoUUID(): String {
@@ -149,6 +157,8 @@ class ReviewViewModel : ViewModel() {
         // so I've never seen this called
         pictureUUID = ""
         pictureNameByUser = ""
+
+        _uploadState.value = UploadState.Error("Upload failed")
     }
 
     fun glideFetch(uuid: String, imageView: ImageView) {
