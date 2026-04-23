@@ -2,11 +2,13 @@ package com.example.localeats.utils
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.navigation.findNavController
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
-import com.example.localeats.model.PhotoMeta
 import com.example.localeats.databinding.ImageRowBinding
+import com.example.localeats.model.PhotoMeta
+import com.example.localeats.ui.RestaurantDetailFragmentDirections
 
 
 class PhotoMetaAdapter(private val viewModel: ReviewViewModel,
@@ -40,8 +42,13 @@ class PhotoMetaAdapter(private val viewModel: ReviewViewModel,
 //            rowBinding.rowSize.text = photoMeta.byteSize.toString()
 //            rowBinding.rowDate.text = photoMeta.timeStamp?.toDate().toString()
 
-            rowBinding.root.setOnClickListener {
-                onClick(photoMeta)
+            itemView.setOnClickListener {
+
+                val action =
+                    RestaurantDetailFragmentDirections
+                        .actionRestaurantDetailFragmentToPhotoDetailFragment(photoMeta)
+
+                itemView.findNavController().navigate(action)
             }
         }
     }

@@ -1,6 +1,5 @@
 package com.example.localeats.ui
 
-import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Bundle
 import android.util.Log
@@ -11,17 +10,18 @@ import android.widget.Toast
 import androidx.core.app.ActivityCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
+import androidx.navigation.fragment.findNavController
 import com.example.localeats.R
 import com.example.localeats.utils.MapViewModel
+import com.google.android.gms.location.FusedLocationProviderClient
+import com.google.android.gms.location.LocationServices
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MarkerOptions
-import com.google.android.libraries.places.api.Places
-import com.google.android.gms.location.LocationServices
-import com.google.android.gms.location.FusedLocationProviderClient
+import com.google.android.libraries.places.api.model.Place
 
 class MapFragment : Fragment(), OnMapReadyCallback {
 
@@ -47,7 +47,6 @@ class MapFragment : Fragment(), OnMapReadyCallback {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        // viewModel = ViewModelProvider(this)[MapViewModel::class.java]
         viewModel = ViewModelProvider(requireActivity())[MapViewModel::class.java]
 
         val mapFragment = childFragmentManager
@@ -66,13 +65,14 @@ class MapFragment : Fragment(), OnMapReadyCallback {
 
             places.forEach { place ->
                 place.latLng?.let { latLng ->
+                    // Log.e("MAP", "adding marker for ${place.name} at $latLng")
                     val marker = googleMap.addMarker(
                         MarkerOptions()
                             .position(latLng)
                             .title(place.name ?: "Unknown place")
                     )
 
-                    marker?.tag = place.id ?: ""
+                    marker?.tag = place// ?: "" //.id
                     if (marker != null) currentMarkers.add(marker)
                 }
             }
@@ -133,20 +133,25 @@ class MapFragment : Fragment(), OnMapReadyCallback {
                 arrayOf(android.Manifest.permission.ACCESS_FINE_LOCATION), 1001)
             return
         } else {
-            fetchLocationAndLoadPlaces() // onLocationReady()
+            fetchLocationAndLoadPlaces()
         }
 
         googleMap.setOnMarkerClickListener { marker ->
-            val placeId = marker.tag as? String
-            if (placeId.isNullOrEmpty()) return@setOnMarkerClickListener true
-            val name = marker.title ?: "Restaurant"
+            // val placeId = marker.tag as? String
 
-            val intent = Intent(requireContext(), RestaurantDetailActivity::class.java).apply {
-                putExtra("placeId", placeId)
-                putExtra("name", name)
-            }
+            val place = marker.tag as? Place ?: return@setOnMarkerClickListener true
 
-            startActivity(intent)
+            // if (placeId.isNullOrEmpty()) return@setOnMarkerClickListener true
+            // val name = marker.title ?: "Restaurant"
+
+            val action =
+                MapFragmentDirections.actionMapFragmentToRestaurantDetailFragment(
+                    place.id ?: "",
+                    place.name ?: "",
+                    place.address ?: "Unknown address"
+                )
+
+            findNavController().navigate(action)
             true
         }
     }
@@ -161,17 +166,13 @@ class MapFragment : Fragment(), OnMapReadyCallback {
         if (requestCode == 1001 &&
             grantResults.isNotEmpty() &&
             grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-            fetchLocationAndLoadPlaces() // onLocationReady()
+            fetchLocationAndLoadPlaces()
         } else {
             Toast.makeText(requireContext(),
                 "Location permission required to load places",
                 Toast.LENGTH_SHORT).show()
         }
     }
-
-//    private fun loadPlaces(latLng: LatLng) {
-//        viewModel.loadPlaces(API_KEY, latLng)
-//    }
 
     private fun fetchLocationAndLoadPlaces() {
         getUserLocation { latLng ->

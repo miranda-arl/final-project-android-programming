@@ -14,7 +14,6 @@
     <TextView
         android:id="@+id/address"
         android:textSize="20sp"
-        android:textStyle="bold"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"/>
     <LinearLayout
@@ -38,6 +37,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Photos: "
+        android:textSize="15sp"
         android:textStyle="bold"/>
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/photosRv"
@@ -48,14 +48,11 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Reviews: "
+        android:textSize="15sp"
         android:textStyle="bold"/>
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/reviewRecycler"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"/>
-    <FrameLayout
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/fragmentContainer"/>
 </LinearLayout>

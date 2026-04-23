@@ -105,7 +105,7 @@ class PlaceRepository {
             .addHeader("Content-Type", "application/json")
             .addHeader(
                 "X-Goog-FieldMask",
-                "places.id,places.displayName,places.location"
+                "places.id,places.displayName,places.location,places.formattedAddress"
             )
             .build()
 
@@ -147,10 +147,13 @@ class PlaceRepository {
                             )
                         }
 
+                        val address = obj.optString("formattedAddress")
+
                         val place = Place.builder()
                             .setId(id)
                             .setName(name)
                             .setLatLng(latLng)
+                            .setAddress(address)
                             .build()
 
                         results.add(place)
