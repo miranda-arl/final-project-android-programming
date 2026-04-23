@@ -8,16 +8,10 @@
         android:padding="16dp"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
-        <EditText
-            android:id="@+id/addReviewText"
-            android:text="Add Review"
-            android:textStyle="bold"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"/>
         <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content">
-            <EditText
+            <TextView
                 android:id="@+id/ratingText"
                 android:text="Rating: "
                 android:textStyle="bold"
@@ -31,7 +25,7 @@
                 android:layout_height="wrap_content"/>
         </LinearLayout>
 
-        <EditText
+        <TextView
             android:id="@+id/commentText"
             android:text="Comment: "
             android:textStyle="bold"

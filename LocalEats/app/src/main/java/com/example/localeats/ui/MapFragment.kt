@@ -70,9 +70,11 @@ class MapFragment : Fragment(), OnMapReadyCallback {
                         MarkerOptions()
                             .position(latLng)
                             .title(place.name ?: "Unknown place")
+                            // .snippet(place.address ?: "")
                     )
 
                     marker?.tag = place// ?: "" //.id
+                    marker?.showInfoWindow()
                     if (marker != null) currentMarkers.add(marker)
                 }
             }
