@@ -2,6 +2,7 @@ package com.example.localeats.data
 
 import com.google.firebase.Timestamp
 import com.google.firebase.firestore.ServerTimestamp
+import com.google.firebase.firestore.DocumentId
 
 data class Review(
     val userId: String = "",
@@ -11,5 +12,6 @@ data class Review(
     val placeId: String = "",
     val imageUUID: String = "",
     @ServerTimestamp
-    var timeStamp: Timestamp? = null
+    var timeStamp: Timestamp? = null,
+    @DocumentId var firestoreID: String = ""
 )

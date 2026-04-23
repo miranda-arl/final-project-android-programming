@@ -37,7 +37,9 @@ class PhotoMetaAdapter(private val viewModel: ReviewViewModel,
         RecyclerView.ViewHolder(rowBinding.root) {
 
         fun bind(photoMeta: PhotoMeta) {
-            viewModel.glideFetch(photoMeta.uuid, rowBinding.rowImageView)
+            if (photoMeta.uuid.isNotBlank()) {
+                viewModel.glideFetch(photoMeta.uuid, rowBinding.rowImageView)
+            }
 
             rowBinding.ownerName.text = photoMeta.ownerName ?: "Unknown"
 

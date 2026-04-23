@@ -63,6 +63,8 @@ class AddReviewFragment : Fragment() {
         val progressBar = view.findViewById<ProgressBar>(R.id.progressBar)
 
         submitBtn.isEnabled = false
+        viewModel.uploadedPhotoUUID = null
+        viewModel.resetUploadState()
 
         uploadBtn.setOnClickListener {
             viewModel.pictureNameByUser = placeId
@@ -109,7 +111,7 @@ class AddReviewFragment : Fragment() {
 
                 is UploadState.Error -> {
                     progressBar.visibility = View.GONE
-                    submitBtn.isEnabled = true
+                    submitBtn.isEnabled = false
                     Toast.makeText(context, state.message, Toast.LENGTH_SHORT).show()
                 }
 

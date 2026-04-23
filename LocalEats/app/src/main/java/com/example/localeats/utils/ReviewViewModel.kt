@@ -96,7 +96,7 @@ class ReviewViewModel : ViewModel() {
                 .filter { it.imageUUID.isNotEmpty() }
                 .map {
                     PhotoMeta(
-                        firestoreID = "",
+                        firestoreID = it.firestoreID,
                         pictureTitle = it.comment,
                         ownerUid = it.userId,
                         ownerName = it.userName,
