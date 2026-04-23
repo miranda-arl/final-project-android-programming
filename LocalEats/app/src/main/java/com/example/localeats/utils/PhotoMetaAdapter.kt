@@ -2,10 +2,12 @@ package com.example.localeats.utils
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import android.widget.TextView
 import androidx.navigation.findNavController
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
+import com.example.localeats.data.Review
 import com.example.localeats.databinding.ImageRowBinding
 import com.example.localeats.model.PhotoMeta
 import com.example.localeats.ui.RestaurantDetailFragmentDirections
@@ -35,12 +37,9 @@ class PhotoMetaAdapter(private val viewModel: ReviewViewModel,
         RecyclerView.ViewHolder(rowBinding.root) {
 
         fun bind(photoMeta: PhotoMeta) {
-
             viewModel.glideFetch(photoMeta.uuid, rowBinding.rowImageView)
 
-//            rowBinding.rowPictureTitle.text = photoMeta.pictureTitle
-//            rowBinding.rowSize.text = photoMeta.byteSize.toString()
-//            rowBinding.rowDate.text = photoMeta.timeStamp?.toDate().toString()
+            rowBinding.ownerName.text = photoMeta.ownerName ?: "Unknown"
 
             itemView.setOnClickListener {
 
@@ -62,4 +61,9 @@ class PhotoMetaAdapter(private val viewModel: ReviewViewModel,
     override fun onBindViewHolder(holder: VH, position: Int) {
         holder.bind(getItem(position))
     }
+
+//    fun updateData(newPhotoMeta: List<PhotoMeta>) {
+//        reviews = newPhotoMeta
+//        notifyDataSetChanged()
+//    }
 }

@@ -230,45 +230,4 @@ class PlaceRepository {
             }
         })
     }
-
-    // -------------------------
-    // FETCH LAT LNG
-    // -------------------------
-//    private fun fetchPlaceDetails(apiKey: String, placeId: String) {
-//        val url = "https://places.googleapis.com/v1/places/$placeId"
-//
-//        val request = Request.Builder()
-//            .url(url)
-//            .get()
-//            .addHeader("X-Goog-Api-Key", apiKey)
-//            .addHeader("X-Goog-FieldMask", "location,displayName")
-//            .build()
-//
-//        client.newCall(request).enqueue(object : Callback {
-//
-//            override fun onFailure(call: Call, e: IOException) {
-//                e.printStackTrace()
-//            }
-//
-//            override fun onResponse(call: Call, response: Response) {
-//                Log.e("PLACE DETAILS", "Response: ${response.code} - ${response.message}")
-//                response.use {
-//                    val bodyStr = it.body?.string() ?: return
-//                    Log.e("SEARCH RAW RESPONSE", bodyStr)
-//                    val json = JSONObject(bodyStr)
-//
-//                    val location = json.optJSONObject("location") ?: return
-//
-//                    val latLng = LatLng(
-//                        location.getDouble("latitude"),
-//                        location.getDouble("longitude")
-//                    )
-//
-//                    requireActivity().runOnUiThread {
-//                        viewModel.setSelectedPlaceLatLng(latLng)
-//                    }
-//                }
-//            }
-//        })
-//    }
 }

@@ -33,6 +33,9 @@ class MapFragment : Fragment(), OnMapReadyCallback {
         getString(R.string.google_maps_key)
     }
 
+//    private var lastCameraPosition: LatLng? = null
+//    private var lastZoom: Float = 14f
+
     private lateinit var fusedLocationClient: FusedLocationProviderClient
 
     private var currentMarkers = mutableListOf<com.google.android.gms.maps.model.Marker>()
@@ -129,6 +132,12 @@ class MapFragment : Fragment(), OnMapReadyCallback {
                 )
             }
         }
+
+//        googleMap.setOnCameraIdleListener {
+//            val camera = googleMap.cameraPosition
+//            lastCameraPosition = camera.target
+//            lastZoom = camera.zoom
+//        }
     }
 
     override fun onMapReady(map: GoogleMap) {
@@ -164,6 +173,12 @@ class MapFragment : Fragment(), OnMapReadyCallback {
             findNavController().navigate(action)
             true
         }
+//
+//        lastCameraPosition?.let {
+//            googleMap.moveCamera(
+//                CameraUpdateFactory.newLatLngZoom(it, lastZoom)
+//            )
+//        }
     }
 
     override fun onRequestPermissionsResult(

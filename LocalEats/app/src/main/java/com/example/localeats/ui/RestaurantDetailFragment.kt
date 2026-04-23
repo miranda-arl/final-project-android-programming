@@ -6,12 +6,14 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
+import android.widget.RatingBar
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.findNavController
 import androidx.navigation.fragment.findNavController
+import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.localeats.R
@@ -49,7 +51,7 @@ class RestaurantDetailFragment : Fragment() {
         val reviewRecycler = view.findViewById<RecyclerView>(R.id.reviewRecycler)
         reviewRecycler.layoutManager = LinearLayoutManager(requireContext())
 
-        viewModel = ViewModelProvider(this)[ReviewViewModel::class.java]
+        viewModel = ViewModelProvider(requireActivity())[ReviewViewModel::class.java]
 
         reviewAdapter = ReviewAdapter(emptyList(), viewModel)
         reviewRecycler.adapter = reviewAdapter
@@ -61,7 +63,7 @@ class RestaurantDetailFragment : Fragment() {
         }
 
         val photoRecycler = view.findViewById<RecyclerView>(R.id.photosRv)
-        photoRecycler.layoutManager = LinearLayoutManager(requireContext())
+        photoRecycler.layoutManager = GridLayoutManager(requireContext(), 3)
 
         imageAdapter = PhotoMetaAdapter(viewModel) { photo ->
             val action =
@@ -73,6 +75,13 @@ class RestaurantDetailFragment : Fragment() {
 
         photoRecycler.adapter = imageAdapter
 
+        // 2. observe FIRST
+        viewModel.photoMetaList.observe(viewLifecycleOwner) {
+            imageAdapter.submitList(it) // updateData(it)
+            // imageAdapter.notifyDataSetChanged()
+        }
+
+        // 3. THEN trigger load
         viewModel.getPhotosForPlace(placeId)
 
         view.findViewById<Button>(R.id.addReviewBtn).setOnClickListener {
@@ -81,6 +90,10 @@ class RestaurantDetailFragment : Fragment() {
                     .actionRestaurantDetailFragmentToAddReviewFragment(placeId)
 
             findNavController().navigate(action)
+        }
+
+        viewModel.averageRating.observe(viewLifecycleOwner) { avg ->
+            view.findViewById<RatingBar>(R.id.ratingBar).rating = avg
         }
 
         return view

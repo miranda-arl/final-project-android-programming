@@ -20,6 +20,11 @@ class ReviewViewModel : ViewModel() {
     private var allReviews = listOf<Review>()
 
     private var pictureUUID = ""
+
+    val rating: Float = 0f
+
+    val averageRating = MutableLiveData<Float>()
+
     // Only call this from TakePictureWrapper
     fun takePictureUUID(uuid: String) {
         pictureUUID = uuid
@@ -47,8 +52,17 @@ class ReviewViewModel : ViewModel() {
     }
 
     fun getReviewsForPlace(placeId: String) {
-        repository.getReviewsForPlace(placeId) {
-            _reviews.postValue(it)
+        repository.getReviewsForPlace(placeId) { list ->
+
+            _reviews.postValue(list)
+
+            val avg = if (list.isNotEmpty()) {
+                list.map { it.rating }.average().toFloat()
+            } else {
+                0f
+            }
+
+            averageRating.postValue(avg)
         }
     }
 
