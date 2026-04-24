@@ -89,11 +89,13 @@ class AddReviewFragment : Fragment() {
                 is UploadState.Loading -> {
                     progressBar.visibility = View.VISIBLE
                     submitBtn.isEnabled = false
+                    uploadBtn.isEnabled = false
                 }
 
                 is UploadState.Success -> {
                     progressBar.visibility = View.GONE
                     submitBtn.isEnabled = true
+                    uploadBtn.isEnabled = false
 
                     val uuid = viewModel.uploadedPhotoUUID
 
@@ -108,6 +110,7 @@ class AddReviewFragment : Fragment() {
                 is UploadState.Error -> {
                     progressBar.visibility = View.GONE
                     submitBtn.isEnabled = false
+                    uploadBtn.isEnabled = true
                     Toast.makeText(context, state.message, Toast.LENGTH_SHORT).show()
                 }
 
