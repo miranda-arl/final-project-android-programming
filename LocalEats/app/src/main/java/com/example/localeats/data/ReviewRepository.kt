@@ -92,24 +92,6 @@ class ReviewRepository {
             }
     }
 
-    // https://firebase.google.com/docs/firestore/manage-data/add-data#add_a_document
-    fun createPhotoMeta(
-        photoMeta: PhotoMeta,
-        resultListener: (List<PhotoMeta>)->Unit
-    ) {
-        // XXX Write me: add photoMeta
-        db.collection(rootCollection).add(photoMeta)
-            .addOnSuccessListener {
-                Log.d(javaClass.simpleName, "createPhotoMeta succeeded ${photoMeta.uuid}")
-                fetchPhotoMeta( resultListener)
-            }
-            .addOnFailureListener {
-                Log.d(javaClass.simpleName, "createPhotoMeta FAILED ${photoMeta.uuid}", it)
-                fetchPhotoMeta(resultListener)
-            }
-    }
-
-
     /////////////////////////////////////////////////////////////
     // Interact with Firestore db
     // https://firebase.google.com/docs/firestore/query-data/order-limit-data

@@ -86,5 +86,3 @@ class FeedFragment : Fragment() {
         return view
     }
 }
-// user logged out saved to db! wrong, user does not upload right away, saves
-// user retakes picture after uploading, submit disabled

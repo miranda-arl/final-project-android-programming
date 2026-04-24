@@ -122,9 +122,19 @@ class AddReviewFragment : Fragment() {
     private fun saveReview(rating: Float, comment: String, imageUUID: String) {
         val user = FirebaseAuth.getInstance().currentUser
 
+        if (user == null) {
+            Toast.makeText(context, "You must be logged in to submit a review", Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        if (rating <= 0f) {
+            Toast.makeText(context, "Please select a rating", Toast.LENGTH_SHORT).show()
+            return
+        }
+
         val review = Review(
-            userId = user?.uid ?: "",
-            userName = user?.email ?: "Anonymous",
+            userId = user.uid ?: "",
+            userName = user.email ?: "Anonymous",
             comment = comment,
             rating = rating,
             placeId = args.placeId,
@@ -143,3 +153,4 @@ class AddReviewFragment : Fragment() {
             }
     }
 }
+// user logged out saved to db! wrong, user does not upload right away, saves

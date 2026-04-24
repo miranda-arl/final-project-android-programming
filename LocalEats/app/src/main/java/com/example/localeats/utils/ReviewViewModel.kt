@@ -9,7 +9,6 @@ import com.example.localeats.data.ReviewRepository
 import com.example.localeats.glide.Glide
 import com.example.localeats.model.PhotoMeta
 import com.example.localeats.model.UploadState
-import java.io.File
 
 class ReviewViewModel : ViewModel() {
     private val _reviews = MutableLiveData<List<Review>>()
@@ -110,31 +109,10 @@ class ReviewViewModel : ViewModel() {
         }
     }
 
-    private fun createPhotoMeta(pictureTitle: String, uuid : String,
-                                byteSize : Long) {
-        val currentUser = currentAuthUser
-        val photoMeta = PhotoMeta(
-            ownerName = currentUser.name,
-            ownerUid = currentUser.uid,
-            uuid = uuid,
-            byteSize = byteSize,
-            pictureTitle = pictureTitle,
-        )
-        repository.createPhotoMeta(photoMeta) {
-            _photoMetaList.postValue(it)
-        }
-    }
-
     fun pictureSuccess() {
         val photoFile = TakePictureWrapper.fileNameToFile(pictureUUID)
         // XXX Write me while preserving referential integrity
         storage.uploadImage(photoFile, pictureUUID) { sizeBytes ->
-            // This runs AFTER upload completes
-            createPhotoMeta(
-                pictureNameByUser,
-                pictureUUID,
-                sizeBytes
-            )
             uploadedPhotoUUID = pictureUUID
 
             pictureUUID = ""
@@ -147,10 +125,6 @@ class ReviewViewModel : ViewModel() {
     fun resetUploadState() {
         _uploadState.value = UploadState.Idle
     }
-
-//    fun getCurrentPhotoUUID(): String {
-//        return pictureUUID
-//    }
 
     fun pictureFailure() {
         // Note, the camera intent will only create the file if the user hits accept
