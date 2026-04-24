@@ -37,4 +37,12 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"/>
 
+    <TextView
+        android:id="@+id/emptyMyReviewsText"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="You haven't written any reviews yet. Go out and explore some restaurants!"
+        android:gravity="center"
+        android:visibility="gone"/>
+
 </LinearLayout>

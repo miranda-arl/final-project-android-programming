@@ -5,17 +5,15 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.view.inputmethod.EditorInfo
 import android.widget.EditText
 import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.localeats.R
 import com.example.localeats.utils.MapViewModel
-import com.google.android.gms.maps.model.LatLng
-import com.google.android.libraries.places.api.Places
 
 class SearchFragment : Fragment() {
 
@@ -24,10 +22,6 @@ class SearchFragment : Fragment() {
 
     private val API_KEY by lazy {
         getString(R.string.google_maps_key)
-    }
-
-    private val placesClient by lazy {
-        Places.createClient(requireContext())
     }
 
     override fun onCreateView(
@@ -52,12 +46,23 @@ class SearchFragment : Fragment() {
 
         recyclerView.adapter = adapter
 
-        viewModel.searchResults.observe(viewLifecycleOwner) { places ->
-            adapter.submitList(places)
+        lifecycleScope.launchWhenStarted {
+            viewModel.uiState.collect { state ->
+                if (state.isSearchMode) {
+                    adapter.submitList(state.places)
+                }
+            }
         }
 
         clearBut.setOnClickListener {
             searchInput.text.clear()
+
+            viewModel.setSearchMode(false)
+
+            // reload based on current camera
+            viewModel.uiState.value.cameraTarget?.let {
+                viewModel.loadPlaces(API_KEY, it)
+            }
         }
 
         searchInput.addTextChangedListener {
@@ -69,7 +74,9 @@ class SearchFragment : Fragment() {
             }
             if (query.isEmpty()) {
                 // optional manual reset trigger
-                viewModel.loadPlaces(API_KEY, LatLng(37.7749, -122.4194)) // fix it! TODO
+                viewModel.setSearchMode(query.isNotEmpty())
+                viewModel.searchPlaces(API_KEY, query)
+
                 recyclerView.visibility = View.GONE
             }
         }

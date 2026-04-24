@@ -10,6 +10,7 @@ import android.widget.Toast
 import androidx.core.app.ActivityCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import com.example.localeats.R
 import com.example.localeats.model.PlaceDetails
@@ -22,6 +23,7 @@ import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MarkerOptions
+import com.google.android.libraries.places.api.model.Place
 
 class MapFragment : Fragment(), OnMapReadyCallback {
 
@@ -35,6 +37,12 @@ class MapFragment : Fragment(), OnMapReadyCallback {
 
 //    private var lastCameraPosition: LatLng? = null
 //    private var lastZoom: Float = 14f
+    private var lastRenderedCamera: LatLng? = null
+    private var lastRenderedZoom: Float? = null
+
+    private var lastPlaces: List<Place>? = null
+
+    private var lastSelectedPlaceId: String? = null
 
     private lateinit var fusedLocationClient: FusedLocationProviderClient
 
@@ -59,6 +67,7 @@ class MapFragment : Fragment(), OnMapReadyCallback {
 
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(requireActivity())
 
+/*
         viewModel.nearbyPlaces.observe(viewLifecycleOwner) { places ->
 
             if (!::googleMap.isInitialized) return@observe
@@ -103,9 +112,9 @@ class MapFragment : Fragment(), OnMapReadyCallback {
 //
 //                marker?.tag = place.id
 
-                googleMap.animateCamera(
-                    CameraUpdateFactory.newLatLngZoom(it, 15f)
-                )
+//                googleMap.animateCamera(
+//                    CameraUpdateFactory.newLatLngZoom(it, 15f)
+//                )
             }
         }
 
@@ -127,17 +136,86 @@ class MapFragment : Fragment(), OnMapReadyCallback {
                 marker?.tag = details // .id
                 marker?.showInfoWindow()
 
-                googleMap.animateCamera(
-                    CameraUpdateFactory.newLatLngZoom(latLng, 15f)
-                )
+//                googleMap.animateCamera(
+//                    CameraUpdateFactory.newLatLngZoom(latLng, 15f)
+//                )
             }
         }
+*/
 
-//        googleMap.setOnCameraIdleListener {
-//            val camera = googleMap.cameraPosition
-//            lastCameraPosition = camera.target
-//            lastZoom = camera.zoom
-//        }
+        lifecycleScope.launchWhenStarted {
+            viewModel.uiState.collect { state ->
+
+                if (!::googleMap.isInitialized) return@collect
+
+                // Restore camera
+                state.cameraTarget?.let { target ->
+                    if (target != lastRenderedCamera || state.zoom != lastRenderedZoom) {
+                        googleMap.moveCamera(
+                            CameraUpdateFactory.newLatLngZoom(target, state.zoom)
+                        )
+                        lastRenderedCamera = target
+                        lastRenderedZoom = state.zoom
+                    }
+                }
+
+                if (state.places != lastPlaces) {
+                    // Update markers
+                    currentMarkers.forEach { it.remove() }
+                    currentMarkers.clear()
+
+                    state.places.forEach { place ->
+                        place.latLng?.let { latLng ->
+                            val marker = googleMap.addMarker(
+                                MarkerOptions().position(latLng).title(place.name)
+                            )
+
+                            val placeUI = PlaceDetails(
+                                id = place.id ?: "",
+                                name = place.name ?: "",
+                                address = place.address ?: "",
+                                latLng = latLng
+                            )
+
+                            marker?.tag = placeUI
+                            if (marker != null) currentMarkers.add(marker)
+                            marker?.showInfoWindow()
+                        }
+                    }
+                    lastPlaces = state.places
+                }
+
+                // Focus selected place
+                state.selectedPlace?.let { selected ->
+                    // val alreadyExists = state.places.any { it.id == selected.id }
+
+                    if (selected.latLng != null) {
+                        // Update markers
+                        currentMarkers.forEach { it.remove() }
+                        currentMarkers.clear()
+
+                        val marker = googleMap.addMarker(
+                            MarkerOptions()
+                                .position(selected.latLng)
+                                .title(selected.name)
+                        )
+
+                        marker?.tag = selected
+                        if (marker != null) currentMarkers.add(marker)
+                        marker?.showInfoWindow()
+                    }
+
+                    if (selected.id != lastSelectedPlaceId) {
+                        selected.latLng?.let {
+                            googleMap.animateCamera(
+                                CameraUpdateFactory.newLatLngZoom(it, 15f)
+                            )
+                        }
+                        lastSelectedPlaceId = selected.id
+                    }
+                }
+            }
+        }
     }
 
     override fun onMapReady(map: GoogleMap) {
@@ -151,34 +229,31 @@ class MapFragment : Fragment(), OnMapReadyCallback {
                 arrayOf(android.Manifest.permission.ACCESS_FINE_LOCATION), 1001)
             return
         } else {
-            fetchLocationAndLoadPlaces()
+            if (viewModel.uiState.value.cameraTarget == null) {
+                fetchLocationAndLoadPlaces()
+            }
+        }
+
+        googleMap.setOnCameraIdleListener {
+            val cam = googleMap.cameraPosition
+            viewModel.updateCamera(cam.target, cam.zoom)
         }
 
         googleMap.setOnMarkerClickListener { marker ->
-            // val placeId = marker.tag as? String
-            Log.e("marker", "{$marker} and tag ${marker.tag}")
-
             val place = marker.tag as? PlaceDetails ?: return@setOnMarkerClickListener true
+            viewModel.selectPlace(place)
 
-            // if (placeId.isNullOrEmpty()) return@setOnMarkerClickListener true
-            // val name = marker.title ?: "Restaurant"
-
-            val action =
-                MapFragmentDirections.actionMapFragmentToRestaurantDetailFragment(
-                    place.id ?: "",
-                    place.name ?: "",
-                    place.address ?: "Unknown address"
-                )
-
-            findNavController().navigate(action)
+            findNavController().navigate(
+                MapFragmentDirections
+                    .actionMapFragmentToRestaurantDetailFragment(
+                        place.id,
+                        place.name,
+                        place.address
+                    )
+            )
+            // viewModel.clearSelection()
             true
         }
-//
-//        lastCameraPosition?.let {
-//            googleMap.moveCamera(
-//                CameraUpdateFactory.newLatLngZoom(it, lastZoom)
-//            )
-//        }
     }
 
     override fun onRequestPermissionsResult(
@@ -201,11 +276,7 @@ class MapFragment : Fragment(), OnMapReadyCallback {
 
     private fun fetchLocationAndLoadPlaces() {
         getUserLocation { latLng ->
-
-            googleMap.moveCamera(
-                CameraUpdateFactory.newLatLngZoom(latLng, 14f)
-            )
-
+            viewModel.updateCamera(latLng, 14f)
             viewModel.loadPlaces(API_KEY, latLng)
         }
     }

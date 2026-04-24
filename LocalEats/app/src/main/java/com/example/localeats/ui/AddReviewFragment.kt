@@ -11,11 +11,10 @@ import android.widget.ProgressBar
 import android.widget.RatingBar
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.activity.viewModels
-import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
+import androidx.navigation.fragment.navArgs
 import com.example.localeats.R
 import com.example.localeats.data.Review
 import com.example.localeats.model.UploadState
@@ -28,7 +27,7 @@ class AddReviewFragment : Fragment() {
 
     private val viewModel: ReviewViewModel by activityViewModels()
 
-    private var placeId: String = ""
+    private val args: AddReviewFragmentArgs by navArgs()
 
     private val cameraLauncher = registerForActivityResult(
         ActivityResultContracts.TakePicture()
@@ -41,9 +40,6 @@ class AddReviewFragment : Fragment() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
-        val args = requireArguments()
-        placeId = args.getString("placeId") ?: ""
     }
 
     override fun onCreateView(
@@ -67,9 +63,9 @@ class AddReviewFragment : Fragment() {
         viewModel.resetUploadState()
 
         uploadBtn.setOnClickListener {
-            viewModel.pictureNameByUser = placeId
+            viewModel.pictureNameByUser = args.placeId
             TakePictureWrapper.takePicture(
-                placeId,
+                args.placeId,
                 requireActivity(),
                 viewModel,
                 cameraLauncher
@@ -128,7 +124,9 @@ class AddReviewFragment : Fragment() {
             userName = user?.email ?: "Anonymous",
             comment = comment,
             rating = rating,
-            placeId = placeId,
+            placeId = args.placeId,
+            placeName = args.name,
+            placeAddress = args.address,
             imageUUID = imageUUID
         )
 

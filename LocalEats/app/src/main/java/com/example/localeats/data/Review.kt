@@ -9,8 +9,12 @@ data class Review(
     val userName: String = "",
     val comment: String = "",
     val rating: Float = 0f,
+
     val placeId: String = "",
+    val placeName: String = "",
+    val placeAddress: String = "",
     val imageUUID: String = "",
+
     @ServerTimestamp
     var timeStamp: Timestamp? = null,
     @DocumentId var firestoreID: String = ""

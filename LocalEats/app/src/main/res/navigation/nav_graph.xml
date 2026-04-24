@@ -85,6 +85,12 @@
         <argument
             android:name="placeId"
             app:argType="string" />
+        <argument
+            android:name="name"
+            app:argType="string"/>
+        <argument
+            android:name="address"
+            app:argType="string"/>
     </fragment>
 
     <fragment

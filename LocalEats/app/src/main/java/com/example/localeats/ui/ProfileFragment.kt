@@ -39,17 +39,27 @@ class ProfileFragment : Fragment() {
 
         recycler.layoutManager = LinearLayoutManager(requireContext())
 
-        viewModel = ViewModelProvider(this)[ReviewViewModel::class.java]
+        viewModel = ViewModelProvider(requireActivity())[ReviewViewModel::class.java]
 
-        adapter = ReviewAdapter(emptyList(), viewModel)
+        adapter = ReviewAdapter(emptyList(), viewModel, showPlaceInfo = true)
         recycler.adapter = adapter
 
         user?.uid?.let {
             viewModel.getReviewsForUser(it)
         }
 
-        viewModel.reviews.observe(viewLifecycleOwner) {
-            adapter.updateData(it)
+        viewModel.reviews.observe(viewLifecycleOwner) { reviews ->
+            adapter.updateData(reviews)
+
+            val emptyView = view.findViewById<TextView>(R.id.emptyMyReviewsText)
+
+            if (reviews.isNullOrEmpty()) {
+                recycler.visibility = View.GONE
+                emptyView.visibility = View.VISIBLE
+            } else {
+                recycler.visibility = View.VISIBLE
+                emptyView.visibility = View.GONE
+            }
         }
 
         logoutBtn.setOnClickListener {

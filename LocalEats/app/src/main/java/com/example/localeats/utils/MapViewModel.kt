@@ -5,9 +5,12 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.example.localeats.data.PlaceRepository
+import com.example.localeats.model.MapUiState
 import com.example.localeats.model.PlaceDetails
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.libraries.places.api.model.Place
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 
 class MapViewModel : ViewModel() {
     private val repository = PlaceRepository()
@@ -15,61 +18,64 @@ class MapViewModel : ViewModel() {
     private val _places = MutableLiveData<List<Place>>()
     val places: LiveData<List<Place>> = _places
 
-    private val _nearbyPlaces = MutableLiveData<List<Place>>()
-    val nearbyPlaces: LiveData<List<Place>> = _nearbyPlaces
-    private val _searchResults = MutableLiveData<List<Place>>()
-    val searchResults: LiveData<List<Place>> = _searchResults
+    private val _uiState = MutableStateFlow(MapUiState())
+    val uiState: StateFlow<MapUiState> = _uiState
 
-    private val _selectedPlace = MutableLiveData<Place>()
-    val selectedPlace: LiveData<Place> = _selectedPlace
+    fun updateCamera(target: LatLng, zoom: Float) {
+        _uiState.value = _uiState.value.copy(
+            cameraTarget = target,
+            zoom = zoom
+        )
+    }
 
-    private val _selectedLatLng = MutableLiveData<LatLng>()
-    val selectedLatLng: LiveData<LatLng> = _selectedLatLng
+    fun setPlaces(places: List<Place>) {
+        _uiState.value = _uiState.value.copy(
+            places = places
+        )
+    }
 
-    private val _selectedPlaceDetails = MutableLiveData<PlaceDetails>()
-    val selectedPlaceDetails: LiveData<PlaceDetails> = _selectedPlaceDetails
+    fun selectPlace(place: PlaceDetails) {
+        _uiState.value = _uiState.value.copy(
+            selectedPlace = place
+        )
+    }
 
-//    fun setPlaces(list: List<Place>) {
-//        _places.value = list
-//    }
-//
-//    fun setSelectedPlaceLatLng(latLng: LatLng) {
-//        _selectedLatLng.value = latLng
-//    }
-//
-//    fun setSelectedPlace(place: Place) {
-//        _selectedPlace.value = place
-//    }
+    fun clearSelection() {
+        _uiState.value = _uiState.value.copy(
+            selectedPlace = null
+        )
+    }
+
+    fun setSearchMode(enabled: Boolean) {
+        _uiState.value = _uiState.value.copy(
+            isSearchMode = enabled
+        )
+    }
 
     fun loadPlaces(apiKey: String, loc: LatLng, ) {
-        repository.getNearbyPlaces(apiKey, loc.latitude, loc.longitude) {
-            Log.e("VIEWMODEL", "Loaded ${it.size} - first: $(it.firstOrNull()?.name}")
-            _nearbyPlaces.postValue(it)
+        repository.getNearbyPlaces(apiKey, loc.latitude, loc.longitude) { places ->
+            Log.e("VIEWMODEL", "Loaded ${places.size} - first: $(it.firstOrNull()?.name}")
+            _uiState.value = _uiState.value.copy(places = places)
+            // _nearbyPlaces.postValue(places)
         }
     }
 
     fun loadPlaceDetails(apiKey: String, placeId: String) {
         repository.fetchPlaceDetails(apiKey, placeId) { result ->
             result?.let {
-                Log.d("VIEWMODEL", "Loaded: ${it.name} - ${it.address}")
-                _selectedPlaceDetails.postValue(it)
-                it.latLng?.let { latLng ->
-                    _selectedLatLng.postValue(latLng)
-                }
+                _uiState.value = _uiState.value.copy(
+                    selectedPlace = it
+                )
             }
         }
     }
 
     fun searchPlaces(apiKey: String, query: String) {
         repository.searchPlaces(apiKey, query) { results ->
-            Log.d("VIEWMODEL", "Search returned ${results.size} results")
-            _searchResults.postValue(results)
-        }
-    }
-    fun selectPlace(details: PlaceDetails) {
-        _selectedPlaceDetails.postValue(details)
-        details.latLng?.let {
-            _selectedLatLng.postValue(it)
+            _uiState.value = _uiState.value.copy(
+                places = results,
+                isSearchMode = true
+            )
         }
     }
 }

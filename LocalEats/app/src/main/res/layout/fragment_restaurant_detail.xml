@@ -67,7 +67,13 @@
         android:id="@+id/photosRv"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"/>
-
+    <TextView
+        android:id="@+id/emptyPhotos"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="No photos yet"
+        android:gravity="center"
+        android:visibility="gone"/>
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -79,4 +85,11 @@
         android:id="@+id/reviewRecycler"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"/>
+    <TextView
+        android:id="@+id/emptyReviews"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="No reviews yet"
+        android:gravity="center"
+        android:visibility="gone"/>
 </LinearLayout>

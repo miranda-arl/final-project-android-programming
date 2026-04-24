@@ -1,9 +1,11 @@
 package com.example.localeats.ui
 
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.TextView
 import androidx.appcompat.widget.SearchView
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
@@ -28,12 +30,29 @@ class FeedFragment : Fragment() {
 
         val recyclerView = view.findViewById<RecyclerView>(R.id.feedRecyclerView)
         val searchView = view.findViewById<SearchView>(R.id.searchView)
+        searchView.queryHint = "Search places or reviews to filter"
+
+        val params = searchView.layoutParams
+
+        val label = view.findViewById<TextView>(R.id.searchLabel)
+
+        searchView.setOnSearchClickListener {
+            label.visibility = View.GONE
+            params.width = ViewGroup.LayoutParams.MATCH_PARENT
+            searchView.layoutParams = params
+        }
+        searchView.setOnCloseListener {
+            label.visibility = View.VISIBLE
+            params.width = ViewGroup.LayoutParams.WRAP_CONTENT
+            searchView.layoutParams = params
+            false
+        }
 
         recyclerView.layoutManager = LinearLayoutManager(requireContext())
 
         viewModel = ViewModelProvider(this)[ReviewViewModel::class.java]
 
-        adapter = ReviewAdapter(emptyList(), viewModel)
+        adapter = ReviewAdapter(emptyList(), viewModel, showPlaceInfo = true)
         recyclerView.adapter = adapter
 
         // Observe filtered reviews
@@ -67,4 +86,5 @@ class FeedFragment : Fragment() {
         return view
     }
 }
-// do not move map after returning
+// user logged out saved to db! wrong, user does not upload right away, saves
+// user retakes picture after uploading, submit disabled
